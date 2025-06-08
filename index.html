@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8" />
+  <title>پیش‌بینی 💩</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #fff;
+      padding: 2rem;
+      direction: rtl;
+      text-align: center;
+    }
+    textarea {
+      width: 100%;
+      height: 150px;
+      font-size: 1.2rem;
+      padding: 1rem;
+      border-radius: 6px;
+      border: 1px solid #aaa;
+      resize: vertical;
+    }
+    button {
+      margin-top: 1rem;
+      padding: 10px 20px;
+      font-size: 1rem;
+      background-color: #0c8;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    #output {
+      margin-top: 1.5rem;
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <h2>کجا 💩 میاد؟</h2>
+  <textarea id="input" placeholder="۱۰ دست اخیر (۲ خط در هر دست)..."></textarea>
+  <br>
+  <button onclick="predict()">پیش‌بینی</button>
+  <div id="output"></div>
+
+  <script>
+    function predict() {
+      const text = document.getElementById('input').value.trim();
+      const lines = text.split('\n').map(line => line.trim()).filter(line => line.length === 4);
+
+      if (lines.length !== 20) {
+        document.getElementById('output').innerText = "لطفاً دقیقاً ۱۰ دست (۲۰ خط) وارد کن.";
+        return;
+      }
+
+      const row1 = [];
+      const row2 = [];
+      for (let i = 0; i < 10; i++) {
+        row1.push(lines[i * 2]);
+        row2.push(lines[i * 2 + 1]);
+      }
+
+      function predictRow(rows) {
+        const score = [0, 0, 0, 0];
+        for (let i = 0; i < rows.length; i++) {
+          const line = rows[i];
+          const index = line.indexOf('💩');
+          if (index >= 0) {
+            const weight = Math.pow(2, i); // وزن‌دهی نمایی: جدیدها 2x, 4x, 8x ...
+            score[index] += weight;
+          }
+        }
+        const max = Math.max(...score);
+        return score.indexOf(max) + 1;
+      }
+
+      const p1 = predictRow(row1);
+      const p2 = predictRow(row2);
+
+      document.getElementById('output').innerText = 💩 ردیف ۱: خانه ${p1} | ردیف ۲: خانه ${p2};
+    }
+  </script>
+</body>
+</html>
