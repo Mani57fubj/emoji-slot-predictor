@@ -1,0 +1,134 @@
+<!DOCTYPE html><html lang="fa">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ربات پیش‌بینی اسلات 💩🤑</title>
+  <style>
+    body {
+      font-family: "Vazir", sans-serif;
+      background-color: #f9f9f9;
+      text-align: center;
+      padding: 20px;
+      direction: rtl;
+      color: #333;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: #fff;
+      padding: 15px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    textarea {
+      width: 100%;
+      height: 160px;
+      font-size: 18px;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      resize: none;
+      background: #fffefa;
+      margin-bottom: 10px;
+    }
+    button {
+      font-size: 18px;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      background-color: #4CAF50;
+      color: white;
+      cursor: pointer;
+      margin: 5px;
+    }
+    button:hover { background-color: #45a049; }
+    #result {
+      margin-top: 20px;
+      font-size: 20px;
+      white-space: pre-line;
+      color: #222;
+    }
+    @media (max-width: 480px) {
+      textarea { height: 120px; font-size: 16px; }
+      button { font-size: 16px; padding: 10px 16px; }
+      #result { font-size: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>ربات پیش‌بینی اسلات 💩🤑</h2>
+    <p>۲۰ ترکیب آخر رو وارد کن (هر دست دو ردیف، هر ردیف ۴ خانه):</p>
+    <textarea id="input" placeholder="مثلاً:\n🤑🤑💩🤑\n🤑💩🤑🤑\n..."></textarea>
+    <div>
+      <button id="voiceBtn">🎙️ صدای خود را ضبط کن</button>
+      <button onclick="predict()">🔮 پیش‌بینی کن</button>
+    </div>
+    <h3 id="result"></h3>
+  </div>  <script>
+    // Web Speech API برای ورود صوتی
+    const voiceBtn = document.getElementById('voiceBtn');
+    let recognition;
+
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognition = new SpeechRec();
+      recognition.lang = 'fa-IR';
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+
+      voiceBtn.addEventListener('click', () => {
+        recognition.start();
+        voiceBtn.innerText = 'در حال ضبط...';
+      });
+
+      recognition.addEventListener('result', (event) => {
+        const transcript = event.results[0][0].transcript.replace(/خونه/gi, '').replace(/فضا/gi, '').trim();
+        document.getElementById('input').value += '\n' + transcript;
+      });
+
+      recognition.addEventListener('end', () => {
+        voiceBtn.innerText = '🎙️ صدای خود را ضبط کن';
+      });
+    } else {
+      voiceBtn.disabled = true;
+      voiceBtn.innerText = 'ورود صوتی پشتیبانی نمی‌شود';
+    }
+
+    function predict() {
+      const input = document.getElementById("input").value.trim();
+      const lines = input.split('\n').filter(l => l.trim().length === 4);
+      if (lines.length < 10 || lines.length % 2 !== 0) {
+        document.getElementById("result").innerText = "لطفاً حداقل ۵ دست کامل (۱۰ خط) وارد کنید.";
+        return;
+      }
+
+      const row1Counts = [0,0,0,0];
+      const row2Counts = [0,0,0,0];
+
+      for (let i=0; i<lines.length; i+=2) {
+        const weight = (i/2 + 1);
+        const r1 = lines[i], r2 = lines[i+1];
+        for (let j=0; j<4; j++) {
+          if (r1[j] === '💩') row1Counts[j] += weight;
+          if (r2[j] === '💩') row2Counts[j] += weight;
+        }
+      }
+
+      const getText = counts => {
+        const total = counts.reduce((a,b)=>a+b, 0);
+        let text = '';
+        const maxIndex = counts.indexOf(Math.max(...counts));
+        counts.forEach((c,i)=> {
+          const p = total ? Math.round(c/total*100) : 0;
+          text += `خانه ${i+1}: ${p}% احتمال 💩\n`;
+        });
+        text += `\n🎯 بیشترین احتمال در خانه ${maxIndex+1}`;
+        return text;
+      };
+
+      const result = `📍 ردیف ۱:\n${getText(row1Counts)}\n\n📍 ردیف ۲:\n${getText(row2Counts)}`;
+      document.getElementById("result").innerText = result;
+    }
+  </script></body>
+</html>
