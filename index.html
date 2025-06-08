@@ -7,10 +7,36 @@
 <body>
   <h2>ربات پیش‌بینی ایموجی 💩🤑</h2>
   <p>در نسخه‌ی تست: لطفاً ۲۰ ترکیب قبلی رو وارد کن تا ربات پیش‌بینی کنه.</p>
-  <textarea rows="10" cols="30" placeholder="مثلاً: 🤑🤑💩🤑
+  <textarea id="input" rows="10" cols="30" placeholder="مثلاً: 🤑🤑💩🤑
 🤑💩🤑🤑
 ..."></textarea>
   <br>
-  <button>پیش‌بینی کن</button>
+  <button onclick="predict()">پیش‌بینی کن</button>
+
+  <h3 id="result"></h3>
+
+  <script>
+    function predict() {
+      const input = document.getElementById("input").value.trim();
+      const lines = input.split('\n');
+
+      if (lines.length < 3) {
+        document.getElementById("result").innerText = "لطفاً حداقل ۳ خط وارد کن.";
+        return;
+      }
+
+      // تست ساده: اگر بیشتر ترکیب‌ها با 🤑 شروع بشن، بگه خانه اول احتمال 💩 داره
+      let poopInFirst = 0;
+      for (let line of lines) {
+        if (line[0] === '💩') poopInFirst++;
+      }
+
+      const result = poopInFirst > lines.length / 2
+        ? "💩 در خانه اول زیاد دیده شده! شاید اونجا باشه."
+        : "خانه اول معمولاً 💩 نیست. شاید جاهای دیگه باشه.";
+
+      document.getElementById("result").innerText = result;
+    }
+  </script>
 </body>
 </html>
