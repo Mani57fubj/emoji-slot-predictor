@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8" />
+  <title>پیش‌بینی 💩 در اسلات</title>
+  <style>
+    body {
+      font-family: 'Vazirmatn', sans-serif;
+      background: #f9f9f9;
+      padding: 2rem;
+      direction: rtl;
+      text-align: center;
+    }
+    textarea {
+      width: 100%;
+      height: 200px;
+      font-size: 1.2rem;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      resize: vertical;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 1.1rem;
+      border: none;
+      background-color: #4CAF50;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    #output {
+      margin-top: 1.5rem;
+      font-size: 1.4rem;
+      font-weight: bold;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <h2>پیش‌بینی 💩 در اسلات</h2>
+  <p>۲۰ دور اخیر را وارد کن (هر دور شامل ۲ خط است - یکی برای ردیف اول، یکی برای دوم):</p>
+  <textarea id="input" placeholder="مثال:
+🤑💩🤑🤑
+🤑🤑🤑💩
+..."></textarea>
+  <br>
+  <button onclick="predict()">پیش‌بینی کن</button>
+  <div id="output"></div>
+
+  <script>
+    function predict() {
+      const text = document.getElementById('input').value.trim();
+      const lines = text.split('\n').map(line => line.trim()).filter(line => line.length === 4);
+      
+      if (lines.length % 2 !== 0 || lines.length < 4) {
+        document.getElementById('output').innerText = "لطفاً حداقل ۲ دور کامل (۴ خط) وارد کن.";
+        return;
+      }
+
+      const row1History = [];
+      const row2History = [];
+      const totalRounds = Math.floor(lines.length / 2);
+
+      for (let i = 0; i < totalRounds; i++) {
+        row1History.push(lines[i * 2]);
+        row2History.push(lines[i * 2 + 1]);
+      }
+
+      function predictRow(rows) {
+        const score = [0, 0, 0, 0];
+        const total = rows.length;
+        for (let i = 0; i < total; i++) {
+          const line = rows[i];
+          const weight = (i + 1) / total; // وزن‌دهی به دست‌های اخیر
+          const index = line.indexOf('💩');
+          if (index >= 0) {
+            score[index] += weight;
+          }
+        }
+        const maxScore = Math.max(...score);
+        return score.indexOf(maxScore) + 1; // خانه‌های ۱ تا ۴
+      }
+
+      const prediction1 = predictRow(row1History);
+      const prediction2 = predictRow(row2History);
+
+      document.getElementById('output').innerText =
+        💩 در ردیف ۱: خانه ${prediction1} | ردیف ۲: خانه ${prediction2};
+    }
+  </script>
+</body>
+</html>
